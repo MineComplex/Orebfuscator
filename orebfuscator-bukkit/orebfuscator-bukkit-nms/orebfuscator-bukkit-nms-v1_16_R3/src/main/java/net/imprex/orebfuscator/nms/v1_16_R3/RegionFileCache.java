@@ -1,0 +1,45 @@
+package net.imprex.orebfuscator.nms.v1_16_R3;
+
+import dev.imprex.orebfuscator.cache.AbstractRegionFileCache;
+import dev.imprex.orebfuscator.config.api.CacheConfig;
+import dev.imprex.orebfuscator.util.ChunkCacheKey;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.nio.file.Path;
+import net.minecraft.server.v1_16_R3.ChunkCoordIntPair;
+import net.minecraft.server.v1_16_R3.DedicatedServer;
+import net.minecraft.server.v1_16_R3.RegionFile;
+import net.minecraft.server.v1_16_R3.RegionFileCompression;
+import org.bukkit.Bukkit;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
+@NullMarked
+public class RegionFileCache extends AbstractRegionFileCache<RegionFile> {
+
+  RegionFileCache(CacheConfig cacheConfig) {
+    super(cacheConfig);
+  }
+
+  @Override
+  protected RegionFile createRegionFile(Path path) throws IOException {
+    boolean isSyncChunkWrites = serverHandle(Bukkit.getServer(), DedicatedServer.class).isSyncChunkWrites();
+    return new RegionFile(path, path.getParent(), RegionFileCompression.c, isSyncChunkWrites);
+  }
+
+  @Override
+  protected void closeRegionFile(RegionFile t) throws IOException {
+    t.close();
+  }
+
+  @Override
+  protected @Nullable DataInputStream createInputStream(RegionFile t, ChunkCacheKey key) throws IOException {
+    return t.a(new ChunkCoordIntPair(key.x(), key.z()));
+  }
+
+  @Override
+  protected DataOutputStream createOutputStream(RegionFile t, ChunkCacheKey key) throws IOException {
+    return t.c(new ChunkCoordIntPair(key.x(), key.z()));
+  }
+}

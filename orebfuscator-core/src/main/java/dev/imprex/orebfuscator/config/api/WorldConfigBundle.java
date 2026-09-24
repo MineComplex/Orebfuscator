@@ -1,12 +1,17 @@
 package dev.imprex.orebfuscator.config.api;
 
+import java.util.random.RandomGenerator;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
+@NullMarked
 public interface WorldConfigBundle {
 
   BlockFlags blockFlags();
 
-  ObfuscationConfig obfuscation();
+  @Nullable ObfuscationConfig obfuscation();
 
-  ProximityConfig proximity();
+  @Nullable ProximityConfig proximity();
 
   boolean needsObfuscation();
 
@@ -16,7 +21,7 @@ public interface WorldConfigBundle {
 
   boolean shouldObfuscate(int y);
 
-  int nextRandomObfuscationBlock(int y);
+  int nextRandomObfuscationBlock(RandomGenerator random, int y);
 
-  int nextRandomProximityBlock(int y);
+  int nextRandomProximityBlock(RandomGenerator random, int y);
 }

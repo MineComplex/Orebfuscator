@@ -1,11 +1,10 @@
 package dev.imprex.orebfuscator.interop;
 
-import java.util.function.Predicate;
-import dev.imprex.orebfuscator.util.BlockPos;
+import org.jspecify.annotations.NullMarked;
+import dev.imprex.orebfuscator.obfuscation.ObfuscationResponse;
 
+@NullMarked
 public interface ChunkPacketAccessor {
-
-  WorldAccessor world();
 
   int chunkX();
 
@@ -15,7 +14,6 @@ public interface ChunkPacketAccessor {
 
   byte[] data();
 
-  void setData(byte[] data);
+  void update(ObfuscationResponse response);
 
-  void filterBlockEntities(Predicate<BlockPos> predicate);
 }

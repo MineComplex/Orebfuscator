@@ -1,8 +1,8 @@
 package dev.imprex.orebfuscator.chunk;
 
 import java.util.Arrays;
-import dev.imprex.orebfuscator.interop.ChunkPacketAccessor;
 import dev.imprex.orebfuscator.interop.WorldAccessor;
+import dev.imprex.orebfuscator.obfuscation.ObfuscationRequest;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.buffer.Unpooled;
@@ -20,14 +20,15 @@ public class Chunk implements AutoCloseable {
   private final ByteBuf inputBuffer;
   private final ByteBuf outputBuffer;
 
-  Chunk(ChunkFactory factory, ChunkPacketAccessor packet) {
+  Chunk(ChunkFactory factory, ObfuscationRequest request) {
     this.factory = factory;
 
+    final var packet = request.packet();
     this.chunkX = packet.chunkX();
     this.chunkZ = packet.chunkZ();
 
-    this.worldAccessor = packet.world();
-    this.sections = new ChunkSectionHolder[this.worldAccessor.getSectionCount()];
+    this.worldAccessor = request.world();
+    this.sections = new ChunkSectionHolder[this.worldAccessor.sectionCount()];
 
     byte[] data = packet.data();
     this.inputBuffer = Unpooled.wrappedBuffer(data);
@@ -58,7 +59,7 @@ public class Chunk implements AutoCloseable {
 
   public int getBlockState(int x, int y, int z) {
     if (x >> 4 == this.chunkX && z >> 4 == this.chunkZ) {
-      ChunkSectionHolder chunkSection = this.sections[this.worldAccessor.getSectionIndex(y)];
+      ChunkSectionHolder chunkSection = this.sections[this.worldAccessor.sectionIndex(y)];
       if (chunkSection != null) {
         return chunkSection.data[ChunkSection.positionToIndex(x & 0xF, y & 0xF, z & 0xF)];
       }
@@ -83,7 +84,7 @@ public class Chunk implements AutoCloseable {
   }
 
   @Override
-  public void close() throws Exception {
+  public void close() {
     this.inputBuffer.release();
     this.outputBuffer.release();
   }

@@ -3,13 +3,13 @@ package dev.imprex.orebfuscator.util;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.function.Consumer;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * Simple cache implementation that removes the oldest element once a certain size is reached
  */
+@NullMarked
 public class SimpleCache<K, V> extends LinkedHashMap<K, V> {
-
-  private static final long serialVersionUID = -2732738355560313649L;
 
   private final int maximumSize;
   private final Consumer<Map.Entry<K, V>> remove;

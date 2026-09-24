@@ -1,6 +1,7 @@
 package dev.imprex.orebfuscator.config;
 
 import java.io.IOException;
+import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
@@ -13,7 +14,9 @@ import dev.imprex.orebfuscator.config.yaml.ConfigurationSection;
 import dev.imprex.orebfuscator.interop.ServerAccessor;
 import dev.imprex.orebfuscator.logging.OfcLogger;
 import dev.imprex.orebfuscator.util.ChunkCacheKey;
+import org.jspecify.annotations.NullMarked;
 
+@NullMarked
 public class OrebfuscatorCacheConfig implements CacheConfig {
 
   private final Path worldDirectory;
@@ -33,7 +36,7 @@ public class OrebfuscatorCacheConfig implements CacheConfig {
   private boolean enableDiskCache = false;
 
   public OrebfuscatorCacheConfig(ServerAccessor server) {
-    this.worldDirectory = server.getWorldDirectory().normalize();
+    this.worldDirectory = server.worldDirectory().normalize();
     this.baseDirectory = this.worldDirectory.resolve("orebfuscator_cache/");
   }
 
@@ -145,7 +148,8 @@ public class OrebfuscatorCacheConfig implements CacheConfig {
 
   @Override
   public Path regionFile(ChunkCacheKey key) {
-    return this.baseDirectory.resolve(key.world())
+    var separator = this.baseDirectory.getFileSystem().getSeparator();
+    return this.baseDirectory.resolve(key.world().replace(":", separator))
         .resolve("r." + (key.x() >> 5) + "." + (key.z() >> 5) + ".mca");
   }
 

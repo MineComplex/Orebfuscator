@@ -1,20 +1,25 @@
 package dev.imprex.orebfuscator.logging;
 
+import dev.imprex.orebfuscator.util.QuickMaths;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Queue;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.atomic.AtomicLong;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
+@NullMarked
 public class OfcLogger {
 
   private static LoggerAccessor logger = new SystemLogger();
-
-  private static final Queue<String> VERBOSE_LOG = new ConcurrentLinkedQueue<>();
   private static boolean verbose;
 
-  public static void setLogger(@NotNull LoggerAccessor logger) {
+  private static final Queue<String> MESSAGE_LOG = new ConcurrentLinkedQueue<>();
+  private static final Map<String, AtomicLong> COUNTERS = new ConcurrentHashMap<>();
+
+  public static void setLogger(LoggerAccessor logger) {
     if (OfcLogger.logger instanceof SystemLogger) {
       OfcLogger.logger = Objects.requireNonNull(logger);
     }
@@ -29,51 +34,55 @@ public class OfcLogger {
     }
   }
 
-  @NotNull
-  public static String getLatestVerboseLog() {
-    return String.join("\n", VERBOSE_LOG);
+  public static String getLatestLog() {
+    return String.join("\n", MESSAGE_LOG);
   }
 
-  public static void debug(@NotNull String message) {
+  public static void debug(String message) {
     log(LogLevel.DEBUG, message);
   }
 
-  public static void info(@NotNull String message) {
+  public static void info(String message) {
     log(LogLevel.INFO, message);
   }
 
-  public static void warn(@NotNull String message) {
+  public static void warn(String message) {
     log(LogLevel.WARN, message);
   }
 
-  public static void error(@NotNull Throwable throwable) {
+  public static void error(Throwable throwable) {
     log(LogLevel.ERROR, "An error occurred:", throwable);
   }
 
-  public static void error(@NotNull String message, @Nullable Throwable throwable) {
+  public static void error(String message, @Nullable Throwable throwable) {
     log(LogLevel.ERROR, message, throwable);
   }
 
-  public static void log(@NotNull LogLevel level, @NotNull String message) {
+  public static void throttle(LogLevel level, String message) {
+    var count = COUNTERS.computeIfAbsent(message, k -> new AtomicLong()).incrementAndGet();
+    if (count < 16) {
+      log(level, message);
+    } else if (QuickMaths.isPowerOfTwo(count)) {
+      log(level, "[x%d] %s".formatted(count, message));
+    }
+  }
+
+  public static void log(LogLevel level, String message) {
     log(level, message, null);
   }
 
-  public static void log(@NotNull LogLevel level, @NotNull String message, @Nullable Throwable throwable) {
+  public static void log(LogLevel level, String message, @Nullable Throwable throwable) {
     Objects.requireNonNull(level);
     Objects.requireNonNull(message);
 
-    if (level == LogLevel.DEBUG) {
-      // always store debug messages for system dumps
-      while (VERBOSE_LOG.size() >= 1000) {
-        VERBOSE_LOG.poll();
-      }
+    while (MESSAGE_LOG.size() >= 2048) {
+      MESSAGE_LOG.poll();
+    }
+    MESSAGE_LOG.offer(message);
 
-      VERBOSE_LOG.offer(message);
-
-      // filter out debug if verbose logging is disabled
-      if (!verbose) {
-        return;
-      }
+    // filter out debug if verbose logging is disabled
+    if (level == LogLevel.DEBUG && !verbose) {
+      return;
     }
 
     logger.log(level, message, throwable);

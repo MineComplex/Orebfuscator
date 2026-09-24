@@ -1,0 +1,50 @@
+package dev.imprex.orebfuscator.statistics;
+
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+import java.util.StringJoiner;
+import java.util.stream.Collectors;
+
+public class StatisticsRegistry {
+
+  private final Map<String, StatisticsSource> sources = new HashMap<>();
+
+  public void register(String name, StatisticsSource source) {
+    if (sources.containsKey(name)) {
+      throw new IllegalArgumentException("Duplicate statistics name: " + name);
+    }
+
+    this.sources.put(name, source);
+  }
+
+  public String format() {
+    var joiner = new StringJoiner("\n", "Here are some useful statistics:\n", "");
+
+    for (var source : sources.values()) {
+      source.add(joiner);
+    }
+
+    return joiner.toString();
+  }
+
+  public String debug() {
+    return entries().stream()
+        .sorted(Comparator.comparing(Map.Entry::getKey))
+        .map(entry -> String.format(" - %s: %s", entry.getKey(), entry.getValue()))
+        .collect(Collectors.joining("\n"));
+  }
+
+  public Set<Entry<String, String>> entries() {
+    var entries = new LinkedHashMap<String, String>();
+
+    for (var source : sources.values()) {
+      source.debug(entries::put);
+    }
+
+    return entries.entrySet();
+  }
+}

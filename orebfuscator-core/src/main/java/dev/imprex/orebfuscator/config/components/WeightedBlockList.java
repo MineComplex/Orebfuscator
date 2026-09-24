@@ -1,5 +1,6 @@
 package dev.imprex.orebfuscator.config.components;
 
+import dev.imprex.orebfuscator.util.BlockProperties;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -14,27 +15,29 @@ import dev.imprex.orebfuscator.interop.WorldAccessor;
 import dev.imprex.orebfuscator.logging.OfcLogger;
 import dev.imprex.orebfuscator.util.BlockPos;
 import dev.imprex.orebfuscator.util.BlockStateProperties;
-import dev.imprex.orebfuscator.util.MathUtil;
+import dev.imprex.orebfuscator.util.QuickMaths;
 import dev.imprex.orebfuscator.util.WeightedRandom;
+import org.jspecify.annotations.NullMarked;
 
+@NullMarked
 public class WeightedBlockList {
 
   public static WeightedRandom[] create(WorldAccessor world, List<WeightedBlockList> lists) {
-    WeightedRandom[] heightMap = new WeightedRandom[world.getHeight()];
+    WeightedRandom[] heightMap = new WeightedRandom[world.height()];
 
     List<WeightedBlockList> last = new ArrayList<>();
     List<WeightedBlockList> next = new ArrayList<>();
 
     int count = 0;
 
-    for (int y = world.getMinBuildHeight(); y < world.getMaxBuildHeight(); y++) {
+    for (int y = world.minBuildHeight(); y < world.maxBuildHeight(); y++) {
       for (WeightedBlockList list : lists) {
         if (list.minY <= y && list.maxY >= y) {
           next.add(list);
         }
       }
 
-      int index = y - world.getMinBuildHeight();
+      int index = y - world.minBuildHeight();
       if (index > 0 && last.equals(next)) {
         // copy last weighted random
         heightMap[index] = heightMap[index - 1];
@@ -45,7 +48,7 @@ public class WeightedBlockList {
           for (Map.Entry<ConfigBlockValue, Integer> entry : list.blocks.entrySet()) {
             // TODO: add support for other block states in future
             var blockStates = entry.getKey().blocks().stream()
-                .map(block -> block.getDefaultBlockState())
+                .map(BlockProperties::getDefaultBlockState)
                 .collect(Collectors.toSet());
             double weight = (double) entry.getValue() / (double) blockStates.size();
 
@@ -53,6 +56,11 @@ public class WeightedBlockList {
               builder.add(state.getId(), weight);
             }
           }
+        }
+
+        if (builder.isEmpty()) {
+          // add air as fallback if builder is empty
+          builder.add(0, 1);
         }
 
         heightMap[index] = builder.build();
@@ -82,8 +90,8 @@ public class WeightedBlockList {
       ConfigParsingContext context) {
     this.name = section.getName();
 
-    int minY = MathUtil.clamp(section.getInt("minY", BlockPos.MIN_Y), BlockPos.MIN_Y, BlockPos.MAX_Y);
-    int maxY = MathUtil.clamp(section.getInt("maxY", BlockPos.MAX_Y), BlockPos.MIN_Y, BlockPos.MAX_Y);
+    int minY = QuickMaths.clamp(section.getInt("minY", BlockPos.MIN_Y), BlockPos.MIN_Y, BlockPos.MAX_Y);
+    int maxY = QuickMaths.clamp(section.getInt("maxY", BlockPos.MAX_Y), BlockPos.MIN_Y, BlockPos.MAX_Y);
 
     this.minY = Math.min(minY, maxY);
     this.maxY = Math.max(minY, maxY);
@@ -128,5 +136,9 @@ public class WeightedBlockList {
 
   public Set<ConfigBlockValue> getBlocks() {
     return Collections.unmodifiableSet(this.blocks.keySet());
+  }
+
+  public boolean matches(int y) {
+    return this.minY <= y && this.maxY >= y;
   }
 }

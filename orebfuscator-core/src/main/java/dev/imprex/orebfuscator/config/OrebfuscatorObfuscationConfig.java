@@ -1,17 +1,18 @@
 package dev.imprex.orebfuscator.config;
 
-import java.util.ArrayList;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
-import com.google.gson.JsonObject;
 import dev.imprex.orebfuscator.config.api.ObfuscationConfig;
 import dev.imprex.orebfuscator.config.components.BlockParser;
 import dev.imprex.orebfuscator.config.components.ConfigBlockValue;
 import dev.imprex.orebfuscator.config.context.ConfigMessage;
 import dev.imprex.orebfuscator.config.context.ConfigParsingContext;
 import dev.imprex.orebfuscator.config.yaml.ConfigurationSection;
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
+import org.jspecify.annotations.NullMarked;
 
+@NullMarked
 public class OrebfuscatorObfuscationConfig extends AbstractWorldConfig implements ObfuscationConfig {
 
   private boolean layerObfuscation = false;
@@ -67,11 +68,9 @@ public class OrebfuscatorObfuscationConfig extends AbstractWorldConfig implement
     section.set("hiddenBlocks", blockNames);
   }
 
-  public JsonObject toJson() {
-    JsonObject object = new JsonObject();
-    object.add("hiddenBlocks", ConfigBlockValue.toJson(hiddenBlocks));
-    object.add("randomBlocks", randomBlocksToJson());
-    return object;
+  public void dumpBlocks(ConfigurationSection section) {
+    ConfigBlockValue.dump(section.createSection("hiddenBlocks"), hiddenBlocks);
+    super.dumpBlocks(section);
   }
 
   @Override

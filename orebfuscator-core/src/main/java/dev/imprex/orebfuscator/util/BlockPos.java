@@ -1,5 +1,8 @@
 package dev.imprex.orebfuscator.util;
 
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 public record BlockPos(int x, int y, int z) implements Comparable<BlockPos> {
 
   // from net.minecraft.core.BlockPos
@@ -24,6 +27,10 @@ public record BlockPos(int x, int y, int z) implements Comparable<BlockPos> {
     return x == 0 && y == 0 && z == 0 ? this : new BlockPos(this.x + x, this.y + y, this.z + z);
   }
 
+  public BlockPos add(BlockPos other) {
+    return this.add(other.x(), other.y(), other.z());
+  }
+
   public double distanceSquared(double x, double y, double z) {
     double dx = this.x - x;
     double dy = this.y - y;
@@ -43,7 +50,7 @@ public record BlockPos(int x, int y, int z) implements Comparable<BlockPos> {
   }
 
   public int toSectionPos() {
-    return (this.x & 0xF) << 12 | (this.y & 0xFFF) << 0 | (this.z & 0xF) << 16;
+    return (this.x & 0xF) << 12 | (this.y & 0xFFF) | (this.z & 0xF) << 16;
   }
 
   public static BlockPos fromSectionPos(int x, int z, int sectionPos) {
@@ -62,10 +69,5 @@ public record BlockPos(int x, int y, int z) implements Comparable<BlockPos> {
       return this.z - other.z;
     }
     return this.y - other.y;
-  }
-
-  @Override
-  public String toString() {
-    return "BlockPos [x=" + x + ", y=" + y + ", z=" + z + "]";
   }
 }

@@ -2,20 +2,28 @@ package dev.imprex.orebfuscator.interop;
 
 import java.nio.file.Path;
 import java.util.List;
+import org.jspecify.annotations.NullMarked;
+import dev.imprex.orebfuscator.cache.AbstractRegionFileCache;
 import dev.imprex.orebfuscator.util.Version;
 
+@NullMarked
 public interface ServerAccessor {
 
-  Path getConfigDirectory();
+  boolean isGameThread();
 
-  Path getWorldDirectory();
+  Path configDirectory();
 
-  String getOrebfuscatorVersion();
+  Path worldDirectory();
 
-  Version getMinecraftVersion();
+  Version orebfuscatorVersion();
 
-  RegistryAccessor getRegistry();
+  Version minecraftVersion();
 
-  List<WorldAccessor> getWorlds();
+  RegistryAccessor registry();
 
+  AbstractRegionFileCache<?> createRegionFileCache();
+
+  List<WorldAccessor> worlds();
+
+  List<PlayerAccessor> players();
 }

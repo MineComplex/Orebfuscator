@@ -5,7 +5,9 @@ import java.util.Map;
 
 import dev.imprex.orebfuscator.config.yaml.ConfigurationSection;
 import dev.imprex.orebfuscator.logging.OfcLogger;
+import org.jspecify.annotations.NullMarked;
 
+@NullMarked
 public class ConfigMigrator {
 
   private static final Map<Integer, ConfigMigration> MIGRATIONS = new HashMap<>();
@@ -15,6 +17,7 @@ public class ConfigMigrator {
     register(new ConfigMigrationV2());
     register(new ConfigMigrationV3());
     register(new ConfigMigrationV4());
+    register(new ConfigMigrationV5());
   }
 
   private static void register(ConfigMigration migration) {

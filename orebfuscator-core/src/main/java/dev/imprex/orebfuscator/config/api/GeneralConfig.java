@@ -1,8 +1,9 @@
 package dev.imprex.orebfuscator.config.api;
 
-public interface GeneralConfig {
+import org.jspecify.annotations.NullMarked;
 
-  boolean checkForUpdates();
+@NullMarked
+public interface GeneralConfig {
 
   boolean updateOnBlockDamage();
 

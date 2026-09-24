@@ -1,6 +1,7 @@
 package dev.imprex.orebfuscator.util;
 
 import java.io.IOException;
+import java.util.Comparator;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Matcher;
@@ -8,11 +9,14 @@ import java.util.regex.Pattern;
 import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
-public record Version(int major, int minor, int patch) implements Comparable<Version> {
+@NullMarked
+public record Version(int major, int minor, int patch, @Nullable String suffix) implements Comparable<Version> {
 
   private static final Pattern VERSION_PATTERN =
-      Pattern.compile("(?<major>\\d+)(?:\\.(?<minor>\\d+))?(?:\\.(?<patch>\\d+))?");
+      Pattern.compile("^(?<major>\\d+)(?:\\.(?<minor>\\d+))?(?:\\.(?<patch>\\d+))?(?<suffix>.+)?$");
 
   public static Version parse(String version) {
     return tryParse(version)
@@ -20,7 +24,7 @@ public record Version(int major, int minor, int patch) implements Comparable<Ver
   }
 
   public static Optional<Version> tryParse(String version) {
-    Matcher matcher = VERSION_PATTERN.matcher(version);
+    Matcher matcher = VERSION_PATTERN.matcher(version.trim());
 
     if (!matcher.find()) {
       return Optional.empty();
@@ -34,7 +38,9 @@ public record Version(int major, int minor, int patch) implements Comparable<Ver
     String patchGroup = matcher.group("patch");
     int patch = patchGroup != null ? Integer.parseInt(patchGroup) : 0;
 
-    return Optional.of(new Version(major, minor, patch));
+    String suffix = matcher.group("suffix");
+
+    return Optional.of(new Version(major, minor, patch, suffix));
   }
 
   public boolean isAbove(String version) {
@@ -81,12 +87,17 @@ public record Version(int major, int minor, int patch) implements Comparable<Ver
       return minor;
     }
 
-    return Integer.compare(this.patch, other.patch);
+    int patch = Integer.compare(this.patch, other.patch);
+    if (patch != 0) {
+      return patch;
+    }
+
+    return Objects.compare(this.suffix, other.suffix, Comparator.nullsLast(Comparator.naturalOrder()));
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(major, minor, patch);
+    return Objects.hash(major, minor, patch, suffix);
   }
 
   @Override
@@ -97,12 +108,12 @@ public record Version(int major, int minor, int patch) implements Comparable<Ver
     if (!(obj instanceof Version other)) {
       return false;
     }
-    return major == other.major && minor == other.minor && patch == other.patch;
+    return major == other.major && minor == other.minor && patch == other.patch && Objects.equals(suffix, other.suffix);
   }
 
   @Override
   public String toString() {
-    return String.format("%s.%s.%s", this.major, this.minor, this.patch);
+    return String.format("%s.%s.%s%s", this.major, this.minor, this.patch, Objects.toString(this.suffix, ""));
   }
 
   public static final class Json extends TypeAdapter<Version> {

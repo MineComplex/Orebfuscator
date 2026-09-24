@@ -1,9 +1,10 @@
 package dev.imprex.orebfuscator.config.context;
 
 import org.jetbrains.annotations.Contract;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
+@NullMarked
 public class ConfigMessage {
 
   public static final ConfigMessage MISSING_OR_EMPTY = fixed("is missing or empty");
@@ -21,6 +22,11 @@ public class ConfigMessage {
       "contains malformed path '%s', using default path '%s'");
   public static final ConfigMessage CACHE_CAN_NOT_CREATE = dynamic("can't create cache directory '%s'");
 
+  public static final ConfigMessage RANDOM_BLOCKS_INCOMPLETE = fixed(
+      "Incomplete height coverage detected in randomBlocks. " +
+          "One or more Y-levels between the configured minY and maxY are not assigned to any section. " +
+          "These uncovered height ranges will use minecraft:air as the fallback replacement material.");
+
   public static final ConfigMessage BLOCK_TAG_UNKNOWN = dynamic("skipping unknown block tag '%s'");
   public static final ConfigMessage BLOCK_TAG_EMPTY = dynamic("skipping empty block tag '%s'");
   public static final ConfigMessage BLOCK_TAG_AIR_BLOCK = dynamic("skipping air block '%s' for block tag '%s'");
@@ -30,25 +36,24 @@ public class ConfigMessage {
   public static final ConfigMessage BLOCK_UNKNOWN = dynamic("skipping unknown block '%s'");
   public static final ConfigMessage BLOCK_AIR = dynamic("skipping air block '%s'");
 
-  private static ConfigMessage fixed(@NotNull String message) {
+  private static ConfigMessage fixed(String message) {
     return new ConfigMessage(message, true);
   }
 
-  private static ConfigMessage dynamic(@NotNull String message) {
+  private static ConfigMessage dynamic(String message) {
     return new ConfigMessage(message, false);
   }
 
   private final String message;
   private final boolean fixed;
 
-  private ConfigMessage(@NotNull String message, boolean fixed) {
+  private ConfigMessage(String message, boolean fixed) {
     this.message = message;
     this.fixed = fixed;
   }
 
-  @NotNull
   @Contract(pure = true)
-  public String format(@Nullable Object... arguments) {
+  public String format(Object @Nullable ... arguments) {
     return this.fixed
         ? this.message
         : String.format(this.message, arguments);

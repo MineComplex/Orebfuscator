@@ -1,11 +1,5 @@
 package dev.imprex.orebfuscator.config;
 
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Set;
-import org.joml.Matrix4f;
-import com.google.gson.JsonObject;
 import dev.imprex.orebfuscator.config.api.BlockFlags;
 import dev.imprex.orebfuscator.config.api.ProximityConfig;
 import dev.imprex.orebfuscator.config.components.BlockParser;
@@ -15,7 +9,14 @@ import dev.imprex.orebfuscator.config.context.ConfigMessage;
 import dev.imprex.orebfuscator.config.context.ConfigParsingContext;
 import dev.imprex.orebfuscator.config.yaml.ConfigurationSection;
 import dev.imprex.orebfuscator.util.BlockProperties;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Set;
+import org.joml.Matrix4f;
+import org.jspecify.annotations.NullMarked;
 
+@NullMarked
 public class OrebfuscatorProximityConfig extends AbstractWorldConfig implements ProximityConfig {
 
   private int distance = 24;
@@ -159,11 +160,9 @@ public class OrebfuscatorProximityConfig extends AbstractWorldConfig implements 
     }
   }
 
-  public JsonObject toJson() {
-    JsonObject object = new JsonObject();
-    object.add("hiddenBlocks", ConfigBlockValue.toJson(hiddenBlocks.keySet()));
-    object.add("randomBlocks", randomBlocksToJson());
-    return object;
+  public void dumpBlocks(ConfigurationSection section) {
+    ConfigBlockValue.dump(section.createSection("hiddenBlocks"), hiddenBlocks.keySet());
+    super.dumpBlocks(section);
   }
 
   @Override

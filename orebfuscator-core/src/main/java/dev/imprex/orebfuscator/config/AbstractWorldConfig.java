@@ -1,9 +1,5 @@
 package dev.imprex.orebfuscator.config;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
-import com.google.gson.JsonObject;
 import dev.imprex.orebfuscator.config.api.WorldConfig;
 import dev.imprex.orebfuscator.config.components.BlockParser;
 import dev.imprex.orebfuscator.config.components.ConfigBlockValue;
@@ -15,9 +11,14 @@ import dev.imprex.orebfuscator.config.yaml.ConfigurationSection;
 import dev.imprex.orebfuscator.interop.WorldAccessor;
 import dev.imprex.orebfuscator.logging.OfcLogger;
 import dev.imprex.orebfuscator.util.BlockPos;
-import dev.imprex.orebfuscator.util.MathUtil;
+import dev.imprex.orebfuscator.util.QuickMaths;
 import dev.imprex.orebfuscator.util.WeightedRandom;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+import org.jspecify.annotations.NullMarked;
 
+@NullMarked
 public abstract class AbstractWorldConfig implements WorldConfig {
 
   private final String name;
@@ -38,8 +39,8 @@ public abstract class AbstractWorldConfig implements WorldConfig {
   protected void deserializeBase(ConfigurationSection section, ConfigParsingContext context) {
     this.enabledValue = section.getBoolean("enabled", true);
 
-    int minY = MathUtil.clamp(section.getInt("minY", BlockPos.MIN_Y), BlockPos.MIN_Y, BlockPos.MAX_Y);
-    int maxY = MathUtil.clamp(section.getInt("maxY", BlockPos.MAX_Y), BlockPos.MIN_Y, BlockPos.MAX_Y);
+    int minY = QuickMaths.clamp(section.getInt("minY", BlockPos.MIN_Y), BlockPos.MIN_Y, BlockPos.MAX_Y);
+    int maxY = QuickMaths.clamp(section.getInt("maxY", BlockPos.MAX_Y), BlockPos.MIN_Y, BlockPos.MAX_Y);
 
     this.minY = Math.min(minY, maxY);
     this.maxY = Math.max(minY, maxY);
@@ -81,7 +82,23 @@ public abstract class AbstractWorldConfig implements WorldConfig {
 
     if (this.weightedBlockLists.isEmpty()) {
       context.error(ConfigMessage.MISSING_OR_EMPTY);
+    } else if (this.areWeightedBlockListsInvalid()) {
+      context.warn(ConfigMessage.RANDOM_BLOCKS_INCOMPLETE);
     }
+  }
+
+  private boolean areWeightedBlockListsInvalid() {
+    yLoop:
+    for (int y = minY; y <= maxY; y++) {
+      for (WeightedBlockList list : this.weightedBlockLists) {
+        if (list.matches(y)) {
+          continue yLoop;
+        }
+      }
+      return true;
+    }
+
+    return false;
   }
 
   protected void serializeRandomBlocks(ConfigurationSection section) {
@@ -100,12 +117,11 @@ public abstract class AbstractWorldConfig implements WorldConfig {
     return name;
   }
 
-  public JsonObject randomBlocksToJson() {
-    JsonObject object = new JsonObject();
+  public void dumpBlocks(ConfigurationSection section) {
+    var randomBlocks = section.createSection("randomBlocks");
     for (WeightedBlockList list : weightedBlockLists) {
-      object.add(list.getName(), ConfigBlockValue.toJson(list.getBlocks()));
+      ConfigBlockValue.dump(randomBlocks.createSection(list.getName()), list.getBlocks());
     }
-    return object;
   }
 
   @Override
@@ -137,7 +153,6 @@ public abstract class AbstractWorldConfig implements WorldConfig {
   public boolean shouldObfuscate(int y) {
     return y >= this.minY && y <= this.maxY;
   }
-
 
   WeightedRandom[] createWeightedRandoms(WorldAccessor world) {
     OfcLogger.debug(String.format("Creating weighted randoms for %s for world %s:", name, world));
