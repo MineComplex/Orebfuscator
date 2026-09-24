@@ -9,7 +9,7 @@ author: Ingrim4
 authors: [NgLoader, lishid, SydMontague, ProgrammerDan, Aleksey-Terzi]
 
 main: net.imprex.orebfuscator.Orebfuscator
-depend: [ProtocolLib]
+depend: [Network]
 
 commands:
   orebfuscator:

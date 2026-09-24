@@ -13,16 +13,10 @@ import org.bukkit.event.world.WorldLoadEvent;
 import org.bukkit.event.world.WorldUnloadEvent;
 import org.bukkit.plugin.Plugin;
 
-import com.comphenix.protocol.reflect.accessors.Accessors;
-import com.comphenix.protocol.reflect.accessors.MethodAccessor;
-
 import dev.imprex.orebfuscator.interop.WorldAccessor;
 import dev.imprex.orebfuscator.logging.OfcLogger;
-import net.imprex.orebfuscator.util.MinecraftVersion;
 
 public class BukkitWorldAccessor implements WorldAccessor {
-
-  private static final boolean HAS_DYNAMIC_HEIGHT = MinecraftVersion.isAtOrAbove("1.17");
 
   private static final Map<World, BukkitWorldAccessor> ACCESSOR_LOOKUP = new ConcurrentHashMap<>();
 
@@ -31,35 +25,6 @@ public class BukkitWorldAccessor implements WorldAccessor {
       OfcLogger.warn("Created world accessor outside of event!");
       return new BukkitWorldAccessor(key);
     });
-  }
-
-  private static final MethodAccessor WORLD_GET_MAX_HEIGHT = getWorldMethod("getMaxHeight");
-  private static final MethodAccessor WORLD_GET_MIN_HEIGHT = getWorldMethod("getMinHeight");
-
-  private static MethodAccessor getWorldMethod(String methodName) {
-    if (HAS_DYNAMIC_HEIGHT) {
-      MethodAccessor methodAccessor = getWorldMethod0(World.class, methodName);
-      if (methodAccessor == null) {
-        throw new RuntimeException("unable to find method: World::" + methodName + "()");
-      }
-      OfcLogger.debug("HeightAccessor found method: World::" + methodName + "()");
-      return methodAccessor;
-    }
-    return null;
-  }
-
-  private static MethodAccessor getWorldMethod0(Class<?> target, String methodName) {
-    try {
-      return Accessors.getMethodAccessor(target, methodName);
-    } catch (IllegalArgumentException e) {
-      for (Class<?> iterface : target.getInterfaces()) {
-        MethodAccessor methodAccessor = getWorldMethod0(iterface, methodName);
-        if (methodAccessor != null) {
-          return methodAccessor;
-        }
-      }
-    }
-    return null;
   }
 
   private static int blockToSectionCoord(int block) {
@@ -96,14 +61,8 @@ public class BukkitWorldAccessor implements WorldAccessor {
 
   private BukkitWorldAccessor(World world) {
     this.world = Objects.requireNonNull(world);
-
-    if (HAS_DYNAMIC_HEIGHT) {
-      this.maxHeight = (int) WORLD_GET_MAX_HEIGHT.invoke(world);
-      this.minHeight = (int) WORLD_GET_MIN_HEIGHT.invoke(world);
-    } else {
-      this.maxHeight = 256;
-      this.minHeight = 0;
-    }
+    this.maxHeight = world.getMaxHeight();
+    this.minHeight = world.getMinHeight();
   }
 
   @Override

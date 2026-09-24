@@ -9,7 +9,6 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.server.PluginEnableEvent;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.ServicePriority;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -37,7 +36,6 @@ public class Orebfuscator extends JavaPlugin implements Listener, ServerAccessor
   private OrebfuscatorStatistics statistics;
   private OrebfuscatorConfig config;
   private OrebfuscatorPlayerMap playerMap;
-  private UpdateSystem updateSystem;
   private ObfuscationCache obfuscationCache;
   private ObfuscationSystem obfuscationSystem;
   private ProximityDirectorThread proximityThread;
@@ -52,17 +50,6 @@ public class Orebfuscator extends JavaPlugin implements Listener, ServerAccessor
   @Override
   public void onEnable() {
     try {
-      // Check for valid minecraft version
-      if (MinecraftVersion.isBelow("1.16")) {
-        throw new RuntimeException("Orebfuscator only supports minecraft 1.16 and above");
-      }
-
-      // Check if protocolLib is enabled
-      Plugin protocolLib = getServer().getPluginManager().getPlugin("ProtocolLib");
-      if (protocolLib == null || !protocolLib.isEnabled()) {
-        throw new RuntimeException("ProtocolLib can't be found or is disabled! Orebfuscator can't be enabled.");
-      }
-
       BukkitWorldAccessor.registerListener(this);
 
       this.statistics = new OrebfuscatorStatistics();
@@ -73,12 +60,6 @@ public class Orebfuscator extends JavaPlugin implements Listener, ServerAccessor
       OrebfuscatorCompatibility.initialize(this, config);
 
       this.playerMap = new OrebfuscatorPlayerMap(this);
-
-      // Initialize metrics
-      new MetricsSystem(this);
-
-      // initialize update system and check for updates
-      this.updateSystem = new UpdateSystem(this);
 
       // Load chunk cache
       this.obfuscationCache = new ObfuscationCache(this);
@@ -157,10 +138,6 @@ public class Orebfuscator extends JavaPlugin implements Listener, ServerAccessor
 
   public OrebfuscatorPlayerMap getPlayerMap() {
     return playerMap;
-  }
-
-  public UpdateSystem getUpdateSystem() {
-    return updateSystem;
   }
 
   public ObfuscationCache getObfuscationCache() {

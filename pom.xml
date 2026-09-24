@@ -25,7 +25,6 @@
     <dependency.folia.version>1.20.1-R0.1-SNAPSHOT</dependency.folia.version>
     <dependency.paper.version>1.20.1-R0.1-SNAPSHOT</dependency.paper.version>
     <dependency.bstats.version>3.1.0</dependency.bstats.version>
-    <dependency.protocollib.version>5.3.0</dependency.protocollib.version>
 
     <!-- new core -->
     <dependency.netty.version>4.1.90.Final</dependency.netty.version>
@@ -63,7 +62,6 @@
 
   <modules>
     <module>orebfuscator-api</module>
-    <module>orebfuscator-api-example</module>
     <module>orebfuscator-core</module>
     <module>orebfuscator-compatibility</module>
     <module>orebfuscator-nms</module>

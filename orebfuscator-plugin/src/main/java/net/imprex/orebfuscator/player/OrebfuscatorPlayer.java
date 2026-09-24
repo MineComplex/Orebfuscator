@@ -53,8 +53,6 @@ public class OrebfuscatorPlayer {
     if (this.config.hasProximityPlayerCheckInterval() &&
         timestamp - this.latestUpdateTimestamp > this.config.proximityPlayerCheckInterval()) {
 
-      // always update location + latestUpdateTimestamp on update
-      this.location = location;
       this.latestUpdateTimestamp = timestamp;
 
       return true;

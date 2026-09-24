@@ -1,5 +1,9 @@
 package net.imprex.orebfuscator.obfuscation;
 
+import dev.imprex.orebfuscator.config.OrebfuscatorConfig;
+import net.imprex.orebfuscator.Orebfuscator;
+import net.imprex.orebfuscator.util.ConsoleUtil;
+import net.imprex.orebfuscator.util.PermissionUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -7,23 +11,11 @@ import org.bukkit.event.Event.Result;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.Action;
-import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.block.BlockBurnEvent;
-import org.bukkit.event.block.BlockDamageEvent;
-import org.bukkit.event.block.BlockExplodeEvent;
-import org.bukkit.event.block.BlockPistonExtendEvent;
-import org.bukkit.event.block.BlockPistonRetractEvent;
+import org.bukkit.event.block.*;
 import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
-
-import dev.imprex.orebfuscator.config.OrebfuscatorConfig;
-import net.imprex.orebfuscator.Orebfuscator;
-import net.imprex.orebfuscator.UpdateSystem;
-import net.imprex.orebfuscator.util.ConsoleUtil;
-import net.imprex.orebfuscator.util.PermissionUtil;
 
 public class DeobfuscationListener implements Listener {
 
@@ -32,12 +24,10 @@ public class DeobfuscationListener implements Listener {
     Bukkit.getPluginManager().registerEvents(listener, orebfuscator);
   }
 
-  private final UpdateSystem updateSystem;
   private final OrebfuscatorConfig config;
   private final DeobfuscationWorker deobfuscationWorker;
 
   private DeobfuscationListener(Orebfuscator orebfuscator, DeobfuscationWorker deobfuscationWorker) {
-    this.updateSystem = orebfuscator.getUpdateSystem();
     this.config = orebfuscator.getOrebfuscatorConfig();
     this.deobfuscationWorker = deobfuscationWorker;
   }
@@ -109,7 +99,6 @@ public class DeobfuscationListener implements Listener {
       if (configReport != null) {
         player.sendMessage("[§bOrebfuscator§f]§c " + ConsoleUtil.replaceAnsiColorWithChatColor(configReport));
       }
-      this.updateSystem.checkForUpdates(player);
     }
   }
 }

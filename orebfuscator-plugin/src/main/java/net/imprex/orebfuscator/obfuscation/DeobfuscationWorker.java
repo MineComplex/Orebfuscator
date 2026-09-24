@@ -1,9 +1,6 @@
 package net.imprex.orebfuscator.obfuscation;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -36,7 +33,7 @@ public class DeobfuscationWorker {
       return;
     }
 
-    deobfuscate(Arrays.asList(block), true);
+    deobfuscate(List.of(block), true);
   }
 
   public void deobfuscate(Collection<? extends Block> blocks, boolean occluding) {

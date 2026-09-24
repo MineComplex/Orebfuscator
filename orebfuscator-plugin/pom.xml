@@ -42,10 +42,6 @@
           </filters>
           <relocations>
             <relocation>
-              <pattern>org.bstats</pattern>
-              <shadedPattern>net.imprex.shaded.org.bstats</shadedPattern>
-            </relocation>
-            <relocation>
               <pattern>org.joml</pattern>
               <shadedPattern>net.imprex.shaded.org.joml</shadedPattern>
             </relocation>
@@ -72,25 +68,19 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>org.spigotmc</groupId>
-      <artifactId>spigot-api</artifactId>
-      <version>${dependency.bukkit.version}</version>
+      <groupId>io.papermc.paper</groupId>
+      <artifactId>paper-api</artifactId>
+      <version>1.21.11-R0.1-SNAPSHOT</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>net.dmulloy2</groupId>
-      <artifactId>ProtocolLib</artifactId>
-      <version>${dependency.protocollib.version}</version>
+      <groupId>ru.minecomplex.network</groupId>
+      <artifactId>bukkit</artifactId>
+      <version>NEW</version>
       <scope>provided</scope>
     </dependency>
 
     <!-- Third-Party -->
-    <dependency>
-      <groupId>org.bstats</groupId>
-      <artifactId>bstats-bukkit</artifactId>
-      <version>${dependency.bstats.version}</version>
-      <scope>compile</scope>
-    </dependency>
     <dependency>
       <groupId>org.joml</groupId>
       <artifactId>joml</artifactId>
@@ -155,12 +145,12 @@
       <version>${revision}</version>
       <scope>compile</scope>
     </dependency>
-    <dependency>
+<!--    <dependency>
       <groupId>net.imprex</groupId>
       <artifactId>orebfuscator-compatibility-folia</artifactId>
       <version>${revision}</version>
       <scope>compile</scope>
-    </dependency>
+    </dependency>-->
     <dependency>
       <groupId>net.imprex</groupId>
       <artifactId>orebfuscator-compatibility-paper</artifactId>
@@ -175,7 +165,7 @@
       <version>${revision}</version>
       <scope>compile</scope>
     </dependency>
-    <dependency>
+<!--    <dependency>
       <groupId>net.imprex</groupId>
       <artifactId>orebfuscator-nms-v1_16_R1</artifactId>
       <version>${revision}</version>
@@ -379,7 +369,7 @@
       <artifactId>orebfuscator-nms-v1_21_R6</artifactId>
       <version>${revision}</version>
       <scope>compile</scope>
-    </dependency>
+    </dependency>-->
     <dependency>
       <groupId>net.imprex</groupId>
       <artifactId>orebfuscator-nms-v1_21_R7</artifactId>

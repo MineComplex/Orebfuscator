@@ -14,8 +14,8 @@
 
   <modules>
     <module>orebfuscator-compatibility-api</module>
-    <module>orebfuscator-compatibility-bukkit</module>
-    <module>orebfuscator-compatibility-folia</module>
+    <module>orebfuscator-compatibility-bukkit</module><!--
+    <module>orebfuscator-compatibility-folia</module>-->
     <module>orebfuscator-compatibility-paper</module>
   </modules>
 </project>

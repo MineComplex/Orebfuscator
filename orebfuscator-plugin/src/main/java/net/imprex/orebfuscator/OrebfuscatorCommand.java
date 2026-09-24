@@ -23,8 +23,6 @@ import org.bukkit.command.TabCompleter;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginDescriptionFile;
 
-import com.comphenix.protocol.ProtocolLibrary;
-import com.comphenix.protocol.events.PacketListener;
 import com.google.gson.JsonObject;
 import com.google.gson.internal.Streams;
 import com.google.gson.stream.JsonWriter;
@@ -74,7 +72,6 @@ public class OrebfuscatorCommand implements CommandExecutor, TabCompleter {
       versions.addProperty("nms", MinecraftVersion.nmsVersion());
       versions.addProperty("server", Bukkit.getVersion());
       versions.addProperty("bukkit", Bukkit.getBukkitVersion());
-      versions.addProperty("protocolLib", ProtocolLibrary.getPlugin().toString());
       versions.addProperty("orebfuscator", orebfuscator.toString());
       root.add("versions", versions);
 
@@ -98,17 +95,6 @@ public class OrebfuscatorCommand implements CommandExecutor, TabCompleter {
         worlds.add(bukkitWorld.getName(), world);
       }
       root.add("worlds", worlds);
-
-      JsonObject listeners = new JsonObject();
-      for (PacketListener packetListener : ProtocolLibrary.getProtocolManager().getPacketListeners()) {
-        JsonObject listener = new JsonObject();
-        listener.addProperty("plugin", packetListener.getPlugin().toString());
-        listener.addProperty("receivingWhitelist", packetListener.getSendingWhitelist().toString());
-        listener.addProperty("sendingWhitelist", packetListener.getSendingWhitelist().toString());
-        String key = packetListener.getClass().toGenericString() + "@" + System.identityHashCode(packetListener);
-        listeners.add(key, listener);
-      }
-      root.add("listeners", listeners);
 
       root.add("blocks", orebfuscator.getOrebfuscatorConfig().toJson());
 
