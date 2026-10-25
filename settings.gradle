@@ -49,7 +49,7 @@ include "orebfuscator-bukkit:orebfuscator-bukkit-nms"
 // include 'orebfuscator-bukkit:orebfuscator-bukkit-nms:orebfuscator-bukkit-nms-v1_21_R4'
 // include 'orebfuscator-bukkit:orebfuscator-bukkit-nms:orebfuscator-bukkit-nms-v1_21_R5'
 // include 'orebfuscator-bukkit:orebfuscator-bukkit-nms:orebfuscator-bukkit-nms-v1_21_R6'
-include 'orebfuscator-bukkit:orebfuscator-bukkit-nms:orebfuscator-bukkit-nms-v1_21_R7'
+// include 'orebfuscator-bukkit:orebfuscator-bukkit-nms:orebfuscator-bukkit-nms-v1_21_R7'
 include 'orebfuscator-bukkit:orebfuscator-bukkit-nms:orebfuscator-bukkit-nms-v26_1'
 // fabric support disabled
 // include "orebfuscator-fabric"

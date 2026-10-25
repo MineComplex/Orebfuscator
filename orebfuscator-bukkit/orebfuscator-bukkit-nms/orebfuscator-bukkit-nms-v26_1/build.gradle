@@ -1,6 +1,7 @@
 dependencies {
     compileOnly(project(":orebfuscator-bukkit:orebfuscator-bukkit-nms"))
-    compileOnly("org.spigotmc:spigot:26.1.2-R0.1-SNAPSHOT")
+    compileOnly("cn.dreeam.leaf:leaf-server:26.3.local-SNAPSHOT")
+    compileOnly("cn.dreeam.leaf:leaf-api:26.3.local-SNAPSHOT")
 }
 
 java {
